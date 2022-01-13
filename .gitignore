@@ -1,0 +1,6 @@
+log.txt
+config.txt
+dist/
+build/
+/__pycache__
+iracingsetupscript.spec
