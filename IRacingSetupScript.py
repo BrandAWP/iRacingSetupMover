@@ -2,6 +2,7 @@
 
 import os
 import fnmatch
+import datetime
 import tkinter as tk
 from tkinter import filedialog
 
@@ -9,14 +10,27 @@ downloadPath = ""
 iRacingPath = ""
 
 
+
 root = tk.Tk()
 root.withdraw()
 root.update()
 movedSetups = 0
 
+now = datetime.datetime.now()
+
 # (removes ->) create log.txt
-with open("log.txt","w") as f:                                                                                                                                                          
-    f.close()
+if not os.path.exists("log.txt"):
+    with open("log.txt","w") as f:                                                                                                                                                          
+        f.close()
+
+else:
+    with open("log.txt","a") as f:
+        f.write("\n")
+        f.write("\n")
+        f.write(str(now.day) + str(now.month) + ": New execute \n")
+
+
+
 
 #if configfile doesnt exists
 if not os.path.exists("config.txt"):                                                                                                                                                    
@@ -66,13 +80,22 @@ for carsetup in files:
         if filteriRacingcars(filepart):                                                                                                                                                 
             setupfolder = filteriRacingcars(filepart)
 
-            #move setupfile to correct folder
-            os.rename(downloadPath + "\\" + carsetup, iRacingPath + "\\" + setupfolder[0] + "\\" + carsetup)                                                                            
-            movedSetups = movedSetups + 1
+            #Move setup to Iracing folder with changed name when already exists (day+month at the end)
+            #File does already exists
+            if os.path.exists(iRacingPath + "\\" + setupfolder[0] + "\\" + carsetup):
+                os.rename(downloadPath + "\\" + carsetup, iRacingPath + "\\" + setupfolder[0] + "\\" + carsetup[0:len(carsetup)-4] + "_" + str(now.day) + "-" + str(now.month) + ".sto")
+            
+            #file does not exist
+            else:
+                os.rename(downloadPath + "\\" + carsetup, iRacingPath + "\\" + setupfolder[0] + "\\" + carsetup)  
+            
+            movedSetups = movedSetups + 1                                                             
+            
 
+            #logging moved setups
             with open("log.txt","a") as f:                                       
                 #log moved files                                           
-                f.write(carsetup + "\t\t\t\t" + " moved from:" + downloadPath + "\\" + carsetup + "\t\t\t\t" + " to: " + iRacingPath + "\\" + setupfolder[0] + "\\" + carsetup + "\n")                                                                                                                                                                      #breaks when setupfolder found
+                f.write(carsetup + "\t\t\t\t" + " moved from:" + downloadPath + "\\" + carsetup + "\t\t\t\t" + " to: " + iRacingPath + "\\" + setupfolder[0] + "\\" + carsetup[0:len(carsetup)-4] + "_" + str(now.day) + "-" + str(now.month) + ".sto" + "\n")                                                                                                                                                                      #breaks when setupfolder found
         
 
 #log amount of moved setups
